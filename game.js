@@ -1,6 +1,6 @@
 (function gameSetup() {
     'use strict';
-    //attach html element with id ship to var ship
+
     var ship = document.getElementById('ship');
 
     // Create your "ship" object and any other variables you might need...
@@ -13,9 +13,8 @@
     };
 
     // initial position
-    //centered ship by documentElement width & height
-    ship.style.left = document.documentElement.clientWidth/2 + "px";
-    ship.style.top = document.documentElement.clientWidth/2 + "px";
+    ship.style.left = document.documentElement.clientWidth / 2 + "px";
+    ship.style.top = document.documentElement.clientWidth / 2 + "px";
 
     var allAsteroids = [];
     ship.addEventListener('asteroidDetected', function(event) {
@@ -24,9 +23,7 @@
 
         // What might you need/want to do in here?
         // console.log(event.detail);
-        //added new asteroids to array
         allAsteroids.push(event.detail);
-
     });
 
     /**
@@ -45,7 +42,7 @@
     function handleKeys(event) {
         switch (event.keyCode) {
             case 37:
-                //rotate anti-clockwise 30deg...yep, went English on this one
+                //rotate anti-clockwise 30deg
                 shipObj.angle -= 30;
                 break;
             case 39:
@@ -83,13 +80,20 @@
         // Read the documentation!
         var move = getShipMovement(shipObj.velocity, shipObj.angle);
 
+
+        // left
+        var xAxis = parseInt(shipObj.serenity.style.left) + move.left + 'px';
         shipObj.serenity.style.left = xAxis;
+        var yAxis = parseInt(shipObj.serenity.style.top) - move.top + 'px';
         shipObj.serenity.style.top = yAxis;
         shipObj.serenity.style.transform = 'rotate(' + shipObj.angle + 'deg)';
-        
+        // right
+
+
+
         // Move the ship here!
-var xAxis = parseInt(shipObj.serenity.style.left) + move.left + 'px';
-var yAxis = parseInt(shipObj.serenity.style.top) - move.top + 'px';
+
+
         // Time to check for any collisions (see below)...
         checkForCollisions();
     }
@@ -117,8 +121,6 @@ var yAxis = parseInt(shipObj.serenity.style.top) - move.top + 'px';
         var shipRightSide = shipBoundary.right;
         var shipBottomSide = shipBoundary.bottom;
         var shipLeftSide = shipBoundary.left;
-        var shipWidth = shipBoundary.width;
-        var shipHeight = shipBoundary.height;
         ////////////////////
         for (var i = 0; i < allAsteroids.length; i++) {
             var allAsteroidEdges = allAsteroids[i].getBoundingClientRect();
@@ -126,18 +128,21 @@ var yAxis = parseInt(shipObj.serenity.style.top) - move.top + 'px';
             var asteroidRight = allAsteroidEdges.right;
             var asteroidTop = allAsteroidEdges.top;
             var asteroidBottom = allAsteroidEdges.bottom;
-            // console.log(shipTopSide);
-            if (shipTopSide <= asteroidBottom &&
-                shipBottomSide <= asteroidTop &&
-                shipRightSide >= asteroidLeft &&
-                shipLeftSide <= asteroidRight) {
+
+            if (
+                shipRightSide > asteroidLeft &&
+                shipLeftSide < asteroidRight &&
+                shipTopSide < asteroidBottom &&
+                shipBottomSide > asteroidTop
+            ) {
                 crash(allAsteroids[i]);
+                shipObj.velocity = 0;
+                alert('You crashed.');
             }
         }
         // Implement me!
 
     }
-
 
     /**
      * This event handler will execute when a crash occurs
@@ -145,7 +150,7 @@ var yAxis = parseInt(shipObj.serenity.style.top) - move.top + 'px';
      * return {void}
      */
     document.querySelector('main').addEventListener('crash', function() {
-        console.log('You were not a leaf on the wind...');
+        console.log('A crash occurred!');
 
         // What might you need/want to do in here?
 
@@ -170,7 +175,7 @@ var yAxis = parseInt(shipObj.serenity.style.top) - move.top + 'px';
      * @return {void}
      */
     function crash(asteroidHit) {
-        document.querySelector('body').removeEventListener('keyup', handleKeys);
+        document.querySelector('body').removeEventListener('keydown', handleKeys);
         asteroidHit.classList.add('hit');
         document.querySelector('#ship').classList.add('crash');
 
